@@ -1,0 +1,382 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NEP 36 — Fair play &#8212; NumPy Enhancement Proposals</title>
+    
+  <link rel="stylesheet" href="_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
+
+    
+  <link rel="stylesheet"
+    href="_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+  <link rel="stylesheet"
+    href="_static/vendor/open-sans_all/1.44.1/index.css">
+  <link rel="stylesheet"
+    href="_static/vendor/lato_latin-ext/1.44.1/index.css">
+
+    
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/basic.css" type="text/css" />
+    
+  <link rel="preload" as="script" href="_static/js/index.d3f166471bb80abb5163.js">
+
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="NEP 37 — A dispatch protocol for NumPy-like modules" href="nep-0037-array-module.html" />
+    <link rel="prev" title="NEP 35 — Array Creation Dispatching With __array_function__" href="nep-0035-array-creation-dispatch-with-array-function.html" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+<link rel="stylesheet" href="_static/numpy.css" type="text/css" />
+
+    <!-- PR #17220: This is added via javascript in versionwarning.js  -->
+    <!-- link rel="canonical" href="http://numpy.org/doc/stable/nep-0036-fair-play.html" / -->
+
+
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main">
+<div class="container-xl">
+
+    <a class="navbar-brand" href="content.html">
+    
+      <img src="_static/numpylogo.svg" class="logo" alt="logo" />
+    
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div id="navbar-menu" class="col-lg-9 collapse navbar-collapse">
+      <ul id="navbar-main-elements" class="navbar-nav mr-auto">
+        
+        
+        <li class="nav-item active">
+            <a class="nav-link" href="index.html">Index</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="scope.html">The Scope of NumPy</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="roadmap.html">Current roadmap</a>
+        </li>
+        
+        
+        <li class="nav-item">
+            <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">Wishlist<i class="fas fa-external-link-alt"></i></a>
+        </li>
+        
+      </ul>
+
+
+      
+
+      <ul class="navbar-nav">
+        
+          <li class="nav-item">
+            <a class="nav-link" href="https://github.com/numpy/numpy" target="_blank" rel="noopener">
+              <span><i class="fab fa-github-square"></i></span>
+            </a>
+          </li>
+        
+        
+          <li class="nav-item">
+            <a class="nav-link" href="https://twitter.com/numpy_team" target="_blank" rel="noopener">
+              <span><i class="fab fa-twitter-square"></i></span>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+          <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form>
+<nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+
+    <div class="bd-toc-item active">
+    
+  
+    <ul class="nav bd-sidenav">
+        
+        
+          
+        
+        
+        
+        
+        
+        
+      </ul>
+  
+  </nav>
+          </div>
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+              
+<div class="tocsection onthispage pt-5 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="nav section-nav flex-column">
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#abstract" class="nav-link">Abstract</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#motivation" class="nav-link">Motivation</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#scope" class="nav-link">Scope</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#fair-play-rules" class="nav-link">Fair play rules</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#questions-and-answers" class="nav-link">Questions and answers</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#discussion" class="nav-link">Discussion</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#references-and-footnotes" class="nav-link">References and footnotes</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#copyright" class="nav-link">Copyright</a>
+        </li>
+    
+    </ul>
+</nav>
+
+
+              
+          </div>
+          
+
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <div class="section" id="nep-36-fair-play">
+<h1>NEP 36 — Fair play<a class="headerlink" href="#nep-36-fair-play" title="Permalink to this headline">¶</a></h1>
+<dl class="field-list simple">
+<dt class="field-odd">Author</dt>
+<dd class="field-odd"><p>Stéfan van der Walt &lt;<a class="reference external" href="mailto:stefanv&#37;&#52;&#48;berkeley&#46;edu">stefanv<span>&#64;</span>berkeley<span>&#46;</span>edu</a>&gt;</p>
+</dd>
+<dt class="field-even">Status</dt>
+<dd class="field-even"><p>Draft</p>
+</dd>
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Informational</p>
+</dd>
+<dt class="field-even">Created</dt>
+<dd class="field-even"><p>2019-10-24</p>
+</dd>
+<dt class="field-odd">Resolution</dt>
+<dd class="field-odd"><p>Draft</p>
+</dd>
+</dl>
+<div class="section" id="abstract">
+<h2>Abstract<a class="headerlink" href="#abstract" title="Permalink to this headline">¶</a></h2>
+<p>This document sets out Rules of Play for companies and outside
+developers that engage with the NumPy project. It covers:</p>
+<ul class="simple">
+<li><p>Restrictions on use of the NumPy name</p></li>
+<li><p>How and whether to publish a modified distribution</p></li>
+<li><p>How to make us aware of patched versions</p></li>
+</ul>
+<p>Companies and developers will know after reading this NEP what kinds
+of behavior the community would like to see, and which we consider
+troublesome, bothersome, and unacceptable.</p>
+</div>
+<div class="section" id="motivation">
+<h2>Motivation<a class="headerlink" href="#motivation" title="Permalink to this headline">¶</a></h2>
+<p>We sometimes learn of NumPy versions modified and circulated by outsiders.
+These patched versions can cause problems for the NumPy community.</p>
+<ul class="simple">
+<li><p>In December 2018, a <a class="reference external" href="https://github.com/numpy/numpy/issues/12515">bug report</a> was filed against
+<cite>np.erf</cite> – a function that didn’t exist in the NumPy distribution.
+It came to light that a company had published a NumPy version with
+an extended API footprint. After several months of discussion, the
+company agreed to make its patches public, and we added a label to
+the NumPy issue tracker to identify issues pertaining to that
+distribution.</p></li>
+<li><p>In another case, after a security issue (CVE-2019-6446) was filed
+against NumPy, distributions put in their own fixes, most often by
+changing a default keyword value. As a result the NumPy API was
+inconsistent across distributions.</p></li>
+</ul>
+<p>When issues arise in cases like these, our developers waste time
+identifying the problematic release, locating alterations,
+and determining an appropriate course of action.</p>
+<p>During a community call on <a class="reference external" href="https://github.com/numpy/archive/blob/master/status_meetings/status-2019-10-16.md">October 16th, 2019</a>
+the community resolved to draft guidelines on the distribution of
+modified NumPy versions.</p>
+</div>
+<div class="section" id="scope">
+<h2>Scope<a class="headerlink" href="#scope" title="Permalink to this headline">¶</a></h2>
+<p>This document aims to define a minimal set of rules that, when
+followed, will be considered good-faith efforts in line with the
+expectations of the NumPy developers.</p>
+<p>Our hope is that developers who feel they need to modify NumPy will
+first consider contributing to the project, or use one of several existing
+mechanisms for extending our APIs and for operating on
+externally defined array objects.</p>
+<p>When in doubt, please <a class="reference external" href="https://numpy.org/community/">talk to us first</a>. We may suggest an alternative; at
+minimum, we’ll be prepared.</p>
+</div>
+<div class="section" id="fair-play-rules">
+<h2>Fair play rules<a class="headerlink" href="#fair-play-rules" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic">
+<li><p>Do not reuse the NumPy name for projects not developed by the NumPy
+community.</p>
+<p>At time of writing, there are only a handful of <code class="docutils literal notranslate"><span class="pre">numpy</span></code>-named
+packages developed by the community, including <code class="docutils literal notranslate"><span class="pre">numpy</span></code>,
+<code class="docutils literal notranslate"><span class="pre">numpy-financial</span></code>, and <code class="docutils literal notranslate"><span class="pre">unumpy</span></code>.  We ask that external packages not
+include the phrase <code class="docutils literal notranslate"><span class="pre">numpy</span></code>, i.e., avoid names such as
+<code class="docutils literal notranslate"><span class="pre">mycompany_numpy</span></code>.</p>
+<p>To be clear, this rule only applies to modules (package names); it
+is perfectly acceptable to have a <em>submodule</em> of your own library
+named <code class="docutils literal notranslate"><span class="pre">mylibrary.numpy</span></code>.</p>
+<p>NumPy is a trademark owned by NumFOCUS.</p>
+</li>
+<li><p>Do not republish modified versions of NumPy.</p>
+<p>Modified versions of NumPy make it very difficult for the
+developers to address bug reports, since we typically do not know
+which parts of NumPy have been modified.</p>
+<p>If you have to break this rule (and we implore you not
+to!), then make it clear in the <code class="docutils literal notranslate"><span class="pre">__version__</span></code> tag that
+you have modified NumPy, e.g.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+<span class="go">&#39;1.17.2+mycompany.15`</span>
+</pre></div>
+</div>
+<p>We understand that minor patches are often required to make a
+library work under a certain distribution.  E.g., Debian may patch
+NumPy so that it searches for optimized BLAS libraries in the
+correct locations.  But we ask that no substantive changes are
+made.</p>
+</li>
+<li><p>Do not extend NumPy’s API footprint.</p>
+<p>If you absolutely have to break rule two, please do not add
+additional functions to the namespace.  NumPy’s API is already
+quite large, and we are working hard to reduce it where feasible.
+Having additional functions exposed in distributed versions is
+confusing for users and developers alike.</p>
+</li>
+<li><p><em>DO</em> use official mechanism to engage with the API.</p>
+<p>Protocols such as <a class="reference external" href="https://numpy.org/neps/nep-0013-ufunc-overrides.html">__array_ufunc__</a> and
+<a class="reference external" href="https://numpy.org/neps/nep-0018-array-function-protocol.html">__array_function__</a>
+were designed to help external packages interact more easily with
+NumPy.  E.g., the latter allows objects from foreign libraries to
+pass through NumPy unharmed.  We actively encourage using any of
+these “officialy sanctioned” mechanisms for overriding or
+interacting with NumPy.</p>
+<p>If these mechanisms are deemed insufficient, please start a
+discussion on the mailing list before monkeypatching NumPy.</p>
+</li>
+</ol>
+</div>
+<div class="section" id="questions-and-answers">
+<h2>Questions and answers<a class="headerlink" href="#questions-and-answers" title="Permalink to this headline">¶</a></h2>
+<p><strong>Q:</strong> We would like to distribute an optimized version of NumPy that
+utilizes special instructions for our company’s CPU.  You recommend
+against that, so what are we to do?</p>
+<p><strong>A:</strong> Please consider including the patches required in the official
+NumPy repository.  Not only do we encourage such contributions, but we
+already have optimized loops for some platforms available.</p>
+<p><strong>Q:</strong> We would like to ship a much faster version of FFT than NumPy
+provides, but NumPy has no mechanism for overriding its FFT routines.
+How do we proceed?</p>
+<p><strong>A:</strong> There are two solutions that we approve of: let the users
+install your optimizations using a piece of code, such as:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">my_company_accel</span> <span class="kn">import</span> <span class="n">patch_numpy_fft</span>
+<span class="n">patch_numpy_fft</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>or have your distribution automatically perform the above, but print a
+message to the terminal clearly stating what is happening:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">We</span> <span class="n">are</span> <span class="n">now</span> <span class="n">patching</span> <span class="n">NumPy</span> <span class="k">for</span> <span class="n">optimal</span> <span class="n">performance</span> <span class="n">under</span> <span class="n">MyComp</span>
+<span class="n">Special</span> <span class="n">Platform</span><span class="o">.</span>  <span class="n">Please</span> <span class="n">direct</span> <span class="nb">all</span> <span class="n">bug</span> <span class="n">reports</span> <span class="n">to</span>
+<span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">mycomp</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">numpy</span><span class="o">-</span><span class="n">bugs</span>
+</pre></div>
+</div>
+<p>If you require additional mechanisms for overriding code, please
+discuss this with the development team on the mailing list.</p>
+<p><strong>Q:</strong> We would like to distribute NumPy with faster linear algebra
+routines. Are we allowed to do this?</p>
+<p><strong>A:</strong> Yes, this is explicitly supported by linking to a different
+version of BLAS.</p>
+</div>
+<div class="section" id="discussion">
+<h2>Discussion<a class="headerlink" href="#discussion" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="references-and-footnotes">
+<h2>References and footnotes<a class="headerlink" href="#references-and-footnotes" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="copyright">
+<h2>Copyright<a class="headerlink" href="#copyright" title="Permalink to this headline">¶</a></h2>
+<p>This document has been placed in the public domain.</p>
+</div>
+</div>
+
+
+              </div>
+              
+              
+          </main>
+          
+
+      </div>
+    </div>
+
+    
+  <script src="_static/js/index.d3f166471bb80abb5163.js"></script>
+
+
+    <footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    <p>
+          &copy; Copyright 2017-2018, NumPy Developers.<br/>
+        Last updated on Feb 22, 2021.<br/>
+        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.1.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

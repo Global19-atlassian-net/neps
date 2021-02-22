@@ -1,0 +1,311 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NEP 8 — A proposal for adding groupby functionality to NumPy &#8212; NumPy Enhancement Proposals</title>
+    
+  <link rel="stylesheet" href="_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
+
+    
+  <link rel="stylesheet"
+    href="_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+  <link rel="stylesheet"
+    href="_static/vendor/open-sans_all/1.44.1/index.css">
+  <link rel="stylesheet"
+    href="_static/vendor/lato_latin-ext/1.44.1/index.css">
+
+    
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/basic.css" type="text/css" />
+    
+  <link rel="preload" as="script" href="_static/js/index.d3f166471bb80abb5163.js">
+
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="NEP 9 — Structured array extensions" href="nep-0009-structured_array_extensions.html" />
+    <link rel="prev" title="NEP 6 — Replacing Trac with a different bug tracker" href="nep-0006-newbugtracker.html" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+<link rel="stylesheet" href="_static/numpy.css" type="text/css" />
+
+    <!-- PR #17220: This is added via javascript in versionwarning.js  -->
+    <!-- link rel="canonical" href="http://numpy.org/doc/stable/nep-0008-groupby_additions.html" / -->
+
+
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main">
+<div class="container-xl">
+
+    <a class="navbar-brand" href="content.html">
+    
+      <img src="_static/numpylogo.svg" class="logo" alt="logo" />
+    
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div id="navbar-menu" class="col-lg-9 collapse navbar-collapse">
+      <ul id="navbar-main-elements" class="navbar-nav mr-auto">
+        
+        
+        <li class="nav-item active">
+            <a class="nav-link" href="index.html">Index</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="scope.html">The Scope of NumPy</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="roadmap.html">Current roadmap</a>
+        </li>
+        
+        
+        <li class="nav-item">
+            <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">Wishlist<i class="fas fa-external-link-alt"></i></a>
+        </li>
+        
+      </ul>
+
+
+      
+
+      <ul class="navbar-nav">
+        
+          <li class="nav-item">
+            <a class="nav-link" href="https://github.com/numpy/numpy" target="_blank" rel="noopener">
+              <span><i class="fab fa-github-square"></i></span>
+            </a>
+          </li>
+        
+        
+          <li class="nav-item">
+            <a class="nav-link" href="https://twitter.com/numpy_team" target="_blank" rel="noopener">
+              <span><i class="fab fa-twitter-square"></i></span>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+          <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form>
+<nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+
+    <div class="bd-toc-item active">
+    
+  
+    <ul class="nav bd-sidenav">
+        
+        
+          
+        
+        
+        
+        
+        
+        
+      </ul>
+  
+  </nav>
+          </div>
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+              
+<div class="tocsection onthispage pt-5 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="nav section-nav flex-column">
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#executive-summary" class="nav-link">Executive summary</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#example-use-case" class="nav-link">Example Use Case</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#ufunc-methods-proposed" class="nav-link">Ufunc methods proposed</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#functions-proposed" class="nav-link">Functions proposed</a>
+        </li>
+    
+    </ul>
+</nav>
+
+
+              
+          </div>
+          
+
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <div class="section" id="nep-8-a-proposal-for-adding-groupby-functionality-to-numpy">
+<span id="nep08"></span><h1>NEP 8 —  A proposal for adding groupby functionality to NumPy<a class="headerlink" href="#nep-8-a-proposal-for-adding-groupby-functionality-to-numpy" title="Permalink to this headline">¶</a></h1>
+<dl class="field-list simple">
+<dt class="field-odd">Author</dt>
+<dd class="field-odd"><p>Travis Oliphant</p>
+</dd>
+<dt class="field-even">Contact</dt>
+<dd class="field-even"><p><a class="reference external" href="mailto:oliphant&#37;&#52;&#48;enthought&#46;com">oliphant<span>&#64;</span>enthought<span>&#46;</span>com</a></p>
+</dd>
+<dt class="field-odd">Date</dt>
+<dd class="field-odd"><p>2010-04-27</p>
+</dd>
+<dt class="field-even">Status</dt>
+<dd class="field-even"><p>Deferred</p>
+</dd>
+</dl>
+<div class="section" id="executive-summary">
+<h2>Executive summary<a class="headerlink" href="#executive-summary" title="Permalink to this headline">¶</a></h2>
+<p>NumPy provides tools for handling data and doing calculations in much
+the same way as relational algebra allows.  However, the common group-by
+functionality is not easily handled.  The reduce methods of NumPy’s
+ufuncs are a natural place to put this groupby behavior.  This NEP
+describes two additional methods for ufuncs (reduceby and reducein) and
+two additional functions (segment and edges) which can help add this
+functionality.</p>
+</div>
+<div class="section" id="example-use-case">
+<h2>Example Use Case<a class="headerlink" href="#example-use-case" title="Permalink to this headline">¶</a></h2>
+<p>Suppose you have a NumPy structured array containing information about
+the number of purchases at several stores over multiple days.  To be clear, the
+structured array data-type is:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dt</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;year&#39;</span><span class="p">,</span> <span class="n">i2</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;month&#39;</span><span class="p">,</span> <span class="n">i1</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;day&#39;</span><span class="p">,</span> <span class="n">i1</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;time&#39;</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span>
+    <span class="p">(</span><span class="s1">&#39;store&#39;</span><span class="p">,</span> <span class="n">i4</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;SKU&#39;</span><span class="p">,</span> <span class="s1">&#39;S6&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;number&#39;</span><span class="p">,</span> <span class="n">i4</span><span class="p">)]</span>
+</pre></div>
+</div>
+<p>Suppose there is a 1-d NumPy array of this data-type and you would like
+to compute various statistics (max, min, mean, sum, etc.) on the number
+of products sold, by product, by month, by store, etc.</p>
+<p>Currently, this could be done by using reduce methods on the number
+field of the array, coupled with in-place sorting, unique with
+return_inverse=True and bincount, etc.  However, for such a common
+data-analysis need, it would be nice to have standard and more direct
+ways to get the results.</p>
+</div>
+<div class="section" id="ufunc-methods-proposed">
+<h2>Ufunc methods proposed<a class="headerlink" href="#ufunc-methods-proposed" title="Permalink to this headline">¶</a></h2>
+<p>It is proposed to add two new reduce-style methods to the ufuncs:
+reduceby and reducein.  The reducein method is intended to be a simpler
+to use version of reduceat, while the reduceby method is intended to
+provide group-by capability on reductions.</p>
+<p>reducein:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">ufunc</span><span class="o">&gt;.</span><span class="n">reducein</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">indices</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+<span class="n">Perform</span> <span class="n">a</span> <span class="n">local</span> <span class="n">reduce</span> <span class="k">with</span> <span class="n">slices</span> <span class="n">specified</span> <span class="n">by</span> <span class="n">pairs</span> <span class="n">of</span> <span class="n">indices</span><span class="o">.</span>
+
+<span class="n">The</span> <span class="n">reduction</span> <span class="n">occurs</span> <span class="n">along</span> <span class="n">the</span> <span class="n">provided</span> <span class="n">axis</span><span class="p">,</span> <span class="n">using</span> <span class="n">the</span> <span class="n">provided</span>
+<span class="n">data</span><span class="o">-</span><span class="nb">type</span> <span class="n">to</span> <span class="n">calculate</span> <span class="n">intermediate</span> <span class="n">results</span><span class="p">,</span> <span class="n">storing</span> <span class="n">the</span> <span class="n">result</span> <span class="n">into</span>
+<span class="n">the</span> <span class="n">array</span> <span class="n">out</span> <span class="p">(</span><span class="k">if</span> <span class="n">provided</span><span class="p">)</span><span class="o">.</span>
+
+<span class="n">The</span> <span class="n">indices</span> <span class="n">array</span> <span class="n">provides</span> <span class="n">the</span> <span class="n">start</span> <span class="ow">and</span> <span class="n">end</span> <span class="n">indices</span> <span class="k">for</span> <span class="n">the</span>
+<span class="n">reduction</span><span class="o">.</span>  <span class="n">If</span> <span class="n">the</span> <span class="n">length</span> <span class="n">of</span> <span class="n">the</span> <span class="n">indices</span> <span class="n">array</span> <span class="ow">is</span> <span class="n">odd</span><span class="p">,</span> <span class="n">then</span> <span class="n">the</span>
+<span class="n">final</span> <span class="n">index</span> <span class="n">provides</span> <span class="n">the</span> <span class="n">beginning</span> <span class="n">point</span> <span class="k">for</span> <span class="n">the</span> <span class="n">final</span> <span class="n">reduction</span>
+<span class="ow">and</span> <span class="n">the</span> <span class="n">ending</span> <span class="n">point</span> <span class="ow">is</span> <span class="n">the</span> <span class="n">end</span> <span class="n">of</span> <span class="n">arr</span><span class="o">.</span>
+
+<span class="n">This</span> <span class="n">generalizes</span> <span class="n">along</span> <span class="n">the</span> <span class="n">given</span> <span class="n">axis</span><span class="p">,</span> <span class="n">the</span> <span class="n">behavior</span><span class="p">:</span>
+
+<span class="p">[</span><span class="o">&lt;</span><span class="n">ufunc</span><span class="o">&gt;.</span><span class="n">reduce</span><span class="p">(</span><span class="n">arr</span><span class="p">[</span><span class="n">indices</span><span class="p">[</span><span class="mi">2</span><span class="o">*</span><span class="n">i</span><span class="p">]:</span><span class="n">indices</span><span class="p">[</span><span class="mi">2</span><span class="o">*</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]])</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">indices</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">)]</span>
+
+<span class="n">This</span> <span class="n">assumes</span> <span class="n">indices</span> <span class="ow">is</span> <span class="n">of</span> <span class="n">even</span> <span class="n">length</span>
+
+<span class="n">Example</span><span class="p">:</span>
+   <span class="o">&gt;&gt;&gt;</span> <span class="n">a</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">9</span><span class="p">,</span><span class="mi">10</span><span class="p">]</span>
+   <span class="o">&gt;&gt;&gt;</span> <span class="n">add</span><span class="o">.</span><span class="n">reducein</span><span class="p">(</span><span class="n">a</span><span class="p">,[</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span>
+   <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">19</span><span class="p">]</span>
+
+   <span class="n">Notice</span> <span class="n">that</span> <span class="nb">sum</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">])</span> <span class="o">=</span> <span class="mi">3</span><span class="p">;</span> <span class="nb">sum</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="mi">5</span><span class="p">])</span> <span class="o">=</span> <span class="mi">11</span><span class="p">;</span> <span class="ow">and</span> <span class="nb">sum</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:])</span> <span class="o">=</span> <span class="mi">19</span>
+</pre></div>
+</div>
+<p>reduceby:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">ufunc</span><span class="o">&gt;.</span><span class="n">reduceby</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">by</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+<span class="n">Perform</span> <span class="n">a</span> <span class="n">reduction</span> <span class="ow">in</span> <span class="n">arr</span> <span class="n">over</span> <span class="n">unique</span> <span class="n">non</span><span class="o">-</span><span class="n">negative</span> <span class="n">integers</span> <span class="ow">in</span> <span class="n">by</span><span class="o">.</span>
+
+
+<span class="n">Let</span> <span class="n">N</span><span class="o">=</span><span class="n">arr</span><span class="o">.</span><span class="n">ndim</span> <span class="ow">and</span> <span class="n">M</span><span class="o">=</span><span class="n">by</span><span class="o">.</span><span class="n">ndim</span><span class="o">.</span>  <span class="n">Then</span><span class="p">,</span> <span class="n">by</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="n">N</span><span class="p">]</span> <span class="o">==</span> <span class="n">arr</span><span class="o">.</span><span class="n">shape</span><span class="o">.</span>
+<span class="n">In</span> <span class="n">addition</span><span class="p">,</span> <span class="n">let</span> <span class="n">I</span> <span class="n">be</span> <span class="n">an</span> <span class="n">N</span><span class="o">-</span><span class="n">length</span> <span class="n">index</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">then</span> <span class="n">by</span><span class="p">[</span><span class="n">I</span><span class="p">]</span>
+<span class="n">contains</span> <span class="n">the</span> <span class="n">location</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">output</span> <span class="n">array</span> <span class="k">for</span> <span class="n">the</span> <span class="n">reduction</span> <span class="n">to</span>
+<span class="n">be</span> <span class="n">stored</span><span class="o">.</span>  <span class="n">Notice</span> <span class="n">that</span> <span class="k">if</span> <span class="n">N</span> <span class="o">==</span> <span class="n">M</span><span class="p">,</span> <span class="n">then</span> <span class="n">by</span><span class="p">[</span><span class="n">I</span><span class="p">]</span> <span class="ow">is</span> <span class="n">a</span> <span class="n">non</span><span class="o">-</span><span class="n">negative</span>
+<span class="n">integer</span><span class="p">,</span> <span class="k">while</span> <span class="k">if</span> <span class="n">N</span> <span class="o">&lt;</span> <span class="n">M</span><span class="p">,</span> <span class="n">then</span> <span class="n">by</span><span class="p">[</span><span class="n">I</span><span class="p">]</span> <span class="ow">is</span> <span class="n">an</span> <span class="n">array</span> <span class="n">of</span> <span class="n">indices</span> <span class="n">into</span>
+<span class="n">the</span> <span class="n">output</span> <span class="n">array</span><span class="o">.</span>
+
+<span class="n">The</span> <span class="n">reduction</span> <span class="ow">is</span> <span class="n">computed</span> <span class="n">on</span> <span class="n">groups</span> <span class="n">specified</span> <span class="n">by</span> <span class="n">unique</span> <span class="n">indices</span>
+<span class="n">into</span> <span class="n">the</span> <span class="n">output</span> <span class="n">array</span><span class="o">.</span> <span class="n">The</span> <span class="n">index</span> <span class="ow">is</span> <span class="n">either</span> <span class="n">the</span> <span class="n">single</span>
+<span class="n">non</span><span class="o">-</span><span class="n">negative</span> <span class="n">integer</span> <span class="k">if</span> <span class="n">N</span> <span class="o">==</span> <span class="n">M</span> <span class="ow">or</span> <span class="k">if</span> <span class="n">N</span> <span class="o">&lt;</span> <span class="n">M</span><span class="p">,</span> <span class="n">the</span> <span class="n">entire</span>
+<span class="p">(</span><span class="n">M</span><span class="o">-</span><span class="n">N</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">-</span><span class="n">length</span> <span class="n">index</span> <span class="n">by</span><span class="p">[</span><span class="n">I</span><span class="p">]</span> <span class="n">considered</span> <span class="k">as</span> <span class="n">a</span> <span class="n">whole</span><span class="o">.</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="functions-proposed">
+<h2>Functions proposed<a class="headerlink" href="#functions-proposed" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>segment</p></li>
+<li><p>edges</p></li>
+</ul>
+</div>
+</div>
+
+
+              </div>
+              
+              
+          </main>
+          
+
+      </div>
+    </div>
+
+    
+  <script src="_static/js/index.d3f166471bb80abb5163.js"></script>
+
+
+    <footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    <p>
+          &copy; Copyright 2017-2018, NumPy Developers.<br/>
+        Last updated on Feb 22, 2021.<br/>
+        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.1.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

@@ -1,0 +1,425 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NEP 24 — Missing Data Functionality - Alternative 1 to NEP 12 &#8212; NumPy Enhancement Proposals</title>
+    
+  <link rel="stylesheet" href="_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
+
+    
+  <link rel="stylesheet"
+    href="_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+  <link rel="stylesheet"
+    href="_static/vendor/open-sans_all/1.44.1/index.css">
+  <link rel="stylesheet"
+    href="_static/vendor/lato_latin-ext/1.44.1/index.css">
+
+    
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/basic.css" type="text/css" />
+    
+  <link rel="preload" as="script" href="_static/js/index.d3f166471bb80abb5163.js">
+
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="NEP 25 — NA support via special dtypes" href="nep-0025-missing-data-3.html" />
+    <link rel="prev" title="NEP 12 — Missing Data Functionality in NumPy" href="nep-0012-missing-data.html" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+<link rel="stylesheet" href="_static/numpy.css" type="text/css" />
+
+    <!-- PR #17220: This is added via javascript in versionwarning.js  -->
+    <!-- link rel="canonical" href="http://numpy.org/doc/stable/nep-0024-missing-data-2.html" / -->
+
+
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main">
+<div class="container-xl">
+
+    <a class="navbar-brand" href="content.html">
+    
+      <img src="_static/numpylogo.svg" class="logo" alt="logo" />
+    
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div id="navbar-menu" class="col-lg-9 collapse navbar-collapse">
+      <ul id="navbar-main-elements" class="navbar-nav mr-auto">
+        
+        
+        <li class="nav-item active">
+            <a class="nav-link" href="index.html">Index</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="scope.html">The Scope of NumPy</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="roadmap.html">Current roadmap</a>
+        </li>
+        
+        
+        <li class="nav-item">
+            <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">Wishlist<i class="fas fa-external-link-alt"></i></a>
+        </li>
+        
+      </ul>
+
+
+      
+
+      <ul class="navbar-nav">
+        
+          <li class="nav-item">
+            <a class="nav-link" href="https://github.com/numpy/numpy" target="_blank" rel="noopener">
+              <span><i class="fab fa-github-square"></i></span>
+            </a>
+          </li>
+        
+        
+          <li class="nav-item">
+            <a class="nav-link" href="https://twitter.com/numpy_team" target="_blank" rel="noopener">
+              <span><i class="fab fa-twitter-square"></i></span>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+          <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form>
+<nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+
+    <div class="bd-toc-item active">
+    
+  
+    <ul class="nav bd-sidenav">
+        
+        
+          
+        
+        
+        
+        
+        
+        
+      </ul>
+  
+  </nav>
+          </div>
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+              
+<div class="tocsection onthispage pt-5 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="nav section-nav flex-column">
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#abstract" class="nav-link">Abstract</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#detailed-description" class="nav-link">Detailed description</a><ul class="nav section-nav flex-column">
+                
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#rationale" class="nav-link">Rationale</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#initialization" class="nav-link">Initialization</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#ufuncs" class="nav-link">Ufuncs</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#assignment" class="nav-link">Assignment</a>
+        </li>
+    
+            </ul>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#copyright" class="nav-link">Copyright</a>
+        </li>
+    
+    </ul>
+</nav>
+
+
+              
+          </div>
+          
+
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <div class="section" id="nep-24-missing-data-functionality-alternative-1-to-nep-12">
+<span id="nep24"></span><h1>NEP 24 — Missing Data Functionality - Alternative 1 to NEP 12<a class="headerlink" href="#nep-24-missing-data-functionality-alternative-1-to-nep-12" title="Permalink to this headline">¶</a></h1>
+<dl class="field-list simple">
+<dt class="field-odd">Author</dt>
+<dd class="field-odd"><p>Nathaniel J. Smith &lt;<a class="reference external" href="mailto:njs&#37;&#52;&#48;pobox&#46;com">njs<span>&#64;</span>pobox<span>&#46;</span>com</a>&gt;, Matthew Brett &lt;<a class="reference external" href="mailto:matthew&#46;brett&#37;&#52;&#48;gmail&#46;com">matthew<span>&#46;</span>brett<span>&#64;</span>gmail<span>&#46;</span>com</a>&gt;</p>
+</dd>
+<dt class="field-even">Status</dt>
+<dd class="field-even"><p>Deferred</p>
+</dd>
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Standards Track</p>
+</dd>
+<dt class="field-even">Created</dt>
+<dd class="field-even"><p>2011-06-30</p>
+</dd>
+</dl>
+<div class="section" id="abstract">
+<h2>Abstract<a class="headerlink" href="#abstract" title="Permalink to this headline">¶</a></h2>
+<p><em>Context: this NEP was written as an alternative to NEP 12, which at the time of writing
+had an implementation that was merged into the NumPy master branch.</em></p>
+<p>The principle of this NEP is to separate the APIs for masking and for missing values, according to</p>
+<ul class="simple">
+<li><p>The current implementation of masked arrays (NEP 12)</p></li>
+<li><p>This proposal.</p></li>
+</ul>
+<p>This discussion is only of the API, and not of the implementation.</p>
+</div>
+<div class="section" id="detailed-description">
+<h2>Detailed description<a class="headerlink" href="#detailed-description" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="rationale">
+<h3>Rationale<a class="headerlink" href="#rationale" title="Permalink to this headline">¶</a></h3>
+<p>The purpose of this NEP is to define two interfaces – one for handling
+‘missing values’, and one for handling ‘masked arrays’.</p>
+<p>An ordinary value is something like an integer or a floating point number. A
+<em>missing</em> value is a placeholder for an ordinary value that is for some
+reason unavailable. For example, in working with statistical data, we often
+build tables in which each row represents one item, and each column
+represents properties of that item. For instance, we might take a group of
+people and for each one record height, age, education level, and income, and
+then stick these values into a table. But then we discover that our research
+assistant screwed up and forgot to record the age of one of our individuals.
+We could throw out the rest of their data as well, but this would be
+wasteful; even such an incomplete row is still perfectly usable for some
+analyses (e.g., we can compute the correlation of height and income). The
+traditional way to handle this would be to stick some particular meaningless
+value in for the missing data, e.g., recording this person’s age as 0. But
+this is very error prone; we may later forget about these special values
+while running other analyses, and discover to our surprise that babies have
+higher incomes than teenagers. (In this case, the solution would be to just
+leave out all the items where we have no age recorded, but this isn’t a
+general solution; many analyses require something more clever to handle
+missing values.) So instead of using an ordinary value like 0, we define a
+special “missing” value, written “NA” for “not available”.</p>
+<p>Therefore, missing values have the following properties: Like any other
+value, they must be supported by your array’s dtype – you can’t store a
+floating point number in an array with dtype=int32, and you can’t store an NA
+in it either. You need an array with dtype=NAint32 or something (exact syntax
+to be determined). Otherwise, they act exactly like any other values. In
+particular, you can apply arithmetic functions and so forth to them. By
+default, any function which takes an NA as an argument always returns an NA
+as well, regardless of the values of the other arguments. This ensures that
+if we try to compute the correlation of income with age, we will get “NA”,
+meaning “given that some of the entries could be anything, the answer could
+be anything as well”. This reminds us to spend a moment thinking about how we
+should rephrase our question to be more meaningful. And as a convenience for
+those times when you do decide that you just want the correlation between the
+known ages and income, then you can enable this behavior by adding a single
+argument to your function call.</p>
+<p>For floating point computations, NAs and NaNs have (almost?) identical
+behavior. But they represent different things – NaN an invalid computation
+like 0/0, NA a value that is not available – and distinguishing between
+these things is useful because in some situations they should be treated
+differently. (For example, an imputation procedure should replace NAs with
+imputed values, but probably should leave NaNs alone.) And anyway, we can’t
+use NaNs for integers, or strings, or booleans, so we need NA anyway, and
+once we have NA support for all these types, we might as well support it for
+floating point too for consistency.</p>
+<p>A masked array is, conceptually, an ordinary rectangular numpy array, which
+has had an arbitrarily-shaped mask placed over it. The result is,
+essentially, a non-rectangular view of a rectangular array. In principle,
+anything you can accomplish with a masked array could also be accomplished by
+explicitly keeping a regular array and a boolean mask array and using numpy
+indexing to combine them for each operation, but combining them into a single
+structure is much more convenient when you need to perform complex operations
+on the masked view of an array, while still being able to manipulate the mask
+in the usual ways. Therefore, masks are preserved through indexing, and
+functions generally treat masked-out values as if they were not even part of
+the array in the first place. (Maybe this is a good heuristic: a length-4
+array in which the last value has been masked out behaves just like an
+ordinary length-3 array, so long as you don’t change the mask.) Except, of
+course, that you are free to manipulate the mask in arbitrary ways whenever
+you like; it’s just a standard numpy array.</p>
+<p>There are some simple situations where one could use either of these tools to
+get the job done – or other tools entirely, like using designated surrogate
+values (age=0), separate mask arrays, etc. But missing values are designed to
+be particularly helpful in situations where the missingness is an intrinsic
+feature of the data – where there’s a specific value that <strong>should</strong> exist,
+if it did exist we’d it’d mean something specific, but it <strong>doesn’t</strong>. Masked
+arrays are designed to be particularly helpful in situations where we just
+want to temporarily ignore some data that does exist, or generally when we
+need to work with data that has a non-rectangular shape (e.g., if you make
+some measurement at each point on a grid laid over a circular agar dish, then
+the points that fall outside the dish aren’t missing measurements, they’re
+just meaningless).</p>
+</div>
+<div class="section" id="initialization">
+<h3>Initialization<a class="headerlink" href="#initialization" title="Permalink to this headline">¶</a></h3>
+<p>First, missing values can be set and be displayed as <code class="docutils literal notranslate"><span class="pre">np.NA,</span> <span class="pre">NA</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">NA</span><span class="p">,</span> <span class="mf">7.0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;NA[f8]&#39;</span><span class="p">)</span>
+<span class="go">array([1., 2., NA, 7.], dtype=&#39;NA[&lt;f8]&#39;)</span>
+</pre></div>
+</div>
+<p>As the initialization is not ambiguous, this can be written without the NA
+dtype:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">NA</span><span class="p">,</span> <span class="mf">7.0</span><span class="p">])</span>
+<span class="go">array([1., 2., NA, 7.], dtype=&#39;NA[&lt;f8]&#39;)</span>
+</pre></div>
+</div>
+<p>Masked values can be set and be displayed as <code class="docutils literal notranslate"><span class="pre">np.IGNORE,</span> <span class="pre">IGNORE</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">IGNORE</span><span class="p">,</span> <span class="mf">7.0</span><span class="p">],</span> <span class="n">masked</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">array([1., 2., IGNORE, 7.], masked=True)</span>
+</pre></div>
+</div>
+<p>As the initialization is not ambiguous, this can be written without
+<code class="docutils literal notranslate"><span class="pre">masked=True</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">IGNORE</span><span class="p">,</span> <span class="mf">7.0</span><span class="p">])</span>
+<span class="go">array([1., 2., IGNORE, 7.], masked=True)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="ufuncs">
+<h3>Ufuncs<a class="headerlink" href="#ufuncs" title="Permalink to this headline">¶</a></h3>
+<p>By default, NA values propagate:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">na_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">NA</span><span class="p">,</span> <span class="mf">7.0</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">na_arr</span><span class="p">)</span>
+<span class="go">NA(&#39;float64&#39;)</span>
+</pre></div>
+</div>
+<p>unless the <code class="docutils literal notranslate"><span class="pre">skipna</span></code> flag is set:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">na_arr</span><span class="p">,</span> <span class="n">skipna</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">10.0</span>
+</pre></div>
+</div>
+<p>By default, masking does not propagate:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">masked_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">IGNORE</span><span class="p">,</span> <span class="mf">7.0</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">masked_arr</span><span class="p">)</span>
+<span class="go">10.0</span>
+</pre></div>
+</div>
+<p>unless the <code class="docutils literal notranslate"><span class="pre">propmask</span></code> flag is set:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">masked_arr</span><span class="p">,</span> <span class="n">propmask</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">IGNORE</span>
+</pre></div>
+</div>
+<p>An array can be masked, and contain NA values:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">both_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">IGNORE</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">NA</span><span class="p">,</span> <span class="mf">7.0</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>In the default case, the behavior is obvious:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">both_arr</span><span class="p">)</span>
+<span class="go">NA(&#39;float64&#39;)</span>
+</pre></div>
+</div>
+<p>It’s also obvious what to do with <code class="docutils literal notranslate"><span class="pre">skipna=True</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">both_arr</span><span class="p">,</span> <span class="n">skipna</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">10.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">both_arr</span><span class="p">,</span> <span class="n">skipna</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">propmask</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">IGNORE</span>
+</pre></div>
+</div>
+<p>To break the tie between NA and MSK, NAs propagate harder:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">both_arr</span><span class="p">,</span> <span class="n">propmask</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">NA(&#39;float64&#39;)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="assignment">
+<h3>Assignment<a class="headerlink" href="#assignment" title="Permalink to this headline">¶</a></h3>
+<p>is obvious in the NA case:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">7.0</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">NA</span>
+<span class="go">TypeError(&#39;dtype does not support NA&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">na_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">7.0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;NA[f8]&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">na_arr</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">NA</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">na_arr</span>
+<span class="go">array([1., 2., NA], dtype=&#39;NA[&lt;f8]&#39;)</span>
+</pre></div>
+</div>
+<p>Direct assignnent in the masked case is magic and confusing, and so happens only
+via the mask:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">masked_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">7.0</span><span class="p">],</span> <span class="n">masked</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">masked_arr</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">NA</span>
+<span class="go">TypeError(&#39;dtype does not support NA&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">masked_arr</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">IGNORE</span>
+<span class="go">TypeError(&#39;float() argument must be a string or a number&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">masked_arr</span><span class="o">.</span><span class="n">visible</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">masked_arr</span>
+<span class="go">array([1., 2., IGNORE], masked=True)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="copyright">
+<h2>Copyright<a class="headerlink" href="#copyright" title="Permalink to this headline">¶</a></h2>
+<p>This document has been placed in the public domain.</p>
+</div>
+</div>
+
+
+              </div>
+              
+              
+          </main>
+          
+
+      </div>
+    </div>
+
+    
+  <script src="_static/js/index.d3f166471bb80abb5163.js"></script>
+
+
+    <footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    <p>
+          &copy; Copyright 2017-2018, NumPy Developers.<br/>
+        Last updated on Feb 22, 2021.<br/>
+        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.1.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

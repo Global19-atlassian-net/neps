@@ -1,0 +1,299 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NEP 2 — A proposal to build numpy without warning with a big set of warning flags &#8212; NumPy Enhancement Proposals</title>
+    
+  <link rel="stylesheet" href="_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
+
+    
+  <link rel="stylesheet"
+    href="_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+  <link rel="stylesheet"
+    href="_static/vendor/open-sans_all/1.44.1/index.css">
+  <link rel="stylesheet"
+    href="_static/vendor/lato_latin-ext/1.44.1/index.css">
+
+    
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/basic.css" type="text/css" />
+    
+  <link rel="preload" as="script" href="_static/js/index.d3f166471bb80abb5163.js">
+
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="NEP 3 — Cleaning the math configuration of numpy.core" href="nep-0003-math_config_clean.html" />
+    <link rel="prev" title="NEP 29 — Recommend Python and NumPy version support as a community policy standard" href="nep-0029-deprecation_policy.html" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+<link rel="stylesheet" href="_static/numpy.css" type="text/css" />
+
+    <!-- PR #17220: This is added via javascript in versionwarning.js  -->
+    <!-- link rel="canonical" href="http://numpy.org/doc/stable/nep-0002-warnfix.html" / -->
+
+
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main">
+<div class="container-xl">
+
+    <a class="navbar-brand" href="content.html">
+    
+      <img src="_static/numpylogo.svg" class="logo" alt="logo" />
+    
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div id="navbar-menu" class="col-lg-9 collapse navbar-collapse">
+      <ul id="navbar-main-elements" class="navbar-nav mr-auto">
+        
+        
+        <li class="nav-item active">
+            <a class="nav-link" href="index.html">Index</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="scope.html">The Scope of NumPy</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="roadmap.html">Current roadmap</a>
+        </li>
+        
+        
+        <li class="nav-item">
+            <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">Wishlist<i class="fas fa-external-link-alt"></i></a>
+        </li>
+        
+      </ul>
+
+
+      
+
+      <ul class="navbar-nav">
+        
+          <li class="nav-item">
+            <a class="nav-link" href="https://github.com/numpy/numpy" target="_blank" rel="noopener">
+              <span><i class="fab fa-github-square"></i></span>
+            </a>
+          </li>
+        
+        
+          <li class="nav-item">
+            <a class="nav-link" href="https://twitter.com/numpy_team" target="_blank" rel="noopener">
+              <span><i class="fab fa-twitter-square"></i></span>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+          <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form>
+<nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+
+    <div class="bd-toc-item active">
+    
+  
+    <ul class="nav bd-sidenav">
+        
+        
+          
+        
+        
+        
+        
+        
+        
+      </ul>
+  
+  </nav>
+          </div>
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+              
+<div class="tocsection onthispage pt-5 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="nav section-nav flex-column">
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#executive-summary" class="nav-link">Executive summary</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#warning-flags" class="nav-link">Warning flags</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#kind-of-warnings" class="nav-link">Kind of warnings</a><ul class="nav section-nav flex-column">
+                
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#unused-parameter" class="nav-link">unused parameter</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#signed-unsigned-comparison" class="nav-link">signed/unsigned comparison</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#half-initialized-structures" class="nav-link">half-initialized structures</a>
+        </li>
+    
+            </ul>
+        </li>
+    
+    </ul>
+</nav>
+
+
+              
+          </div>
+          
+
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <div class="section" id="nep-2-a-proposal-to-build-numpy-without-warning-with-a-big-set-of-warning-flags">
+<span id="nep02"></span><h1>NEP 2 — A proposal to build numpy without warning with a big set of warning flags<a class="headerlink" href="#nep-2-a-proposal-to-build-numpy-without-warning-with-a-big-set-of-warning-flags" title="Permalink to this headline">¶</a></h1>
+<dl class="field-list simple">
+<dt class="field-odd">Author</dt>
+<dd class="field-odd"><p>David Cournapeau</p>
+</dd>
+<dt class="field-even">Contact</dt>
+<dd class="field-even"><p><a class="reference external" href="mailto:david&#37;&#52;&#48;ar&#46;media&#46;kyoto-u&#46;ac&#46;jp">david<span>&#64;</span>ar<span>&#46;</span>media<span>&#46;</span>kyoto-u<span>&#46;</span>ac<span>&#46;</span>jp</a></p>
+</dd>
+<dt class="field-odd">Date</dt>
+<dd class="field-odd"><p>2008-09-04</p>
+</dd>
+<dt class="field-even">Status</dt>
+<dd class="field-even"><p>Deferred</p>
+</dd>
+</dl>
+<div class="section" id="executive-summary">
+<h2>Executive summary<a class="headerlink" href="#executive-summary" title="Permalink to this headline">¶</a></h2>
+<p>When building numpy and scipy, we are limited to a quite restricted set of
+warning compilers, thus missing a large class of potential bugs which could be
+detected with stronger warning flags. The goal of this NEP is present the
+various methods used to clean the code and implement some policy to make numpy
+buildable with a  bigger set of warning flags, while keeping the build warnings
+free.</p>
+</div>
+<div class="section" id="warning-flags">
+<h2>Warning flags<a class="headerlink" href="#warning-flags" title="Permalink to this headline">¶</a></h2>
+<p>Each compiler detects a different set of potential errors. The baseline will
+be gcc -Wall -W -Wextra. Ideally, a complete set would be nice:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>-W -Wall -Wextra -Wstrict-prototypes -Wmissing-prototypes -Waggregate-return
+-Wcast-align -Wcast-qual -Wnested-externs -Wshadow -Wbad-function-cast
+-Wwrite-strings <span class="s2">&quot;</span>
+</pre></div>
+</div>
+<p>Intel compiler, VS with <code class="docutils literal notranslate"><span class="pre">/W3</span> <span class="pre">/Wall</span></code>, Sun compilers have extra warnings too.</p>
+</div>
+<div class="section" id="kind-of-warnings">
+<h2>Kind of warnings<a class="headerlink" href="#kind-of-warnings" title="Permalink to this headline">¶</a></h2>
+<p>C Python extension code tends to naturally generate a lot of spurious warnings.
+The goal is to have some facilities to tag some typical C-Python code so that
+the compilers do not generate warnings in those cases; the tag process has to
+be clean, readable, and be robust. In particular, it should not make the code
+more obscure or worse, break working code.</p>
+<div class="section" id="unused-parameter">
+<h3>unused parameter<a class="headerlink" href="#unused-parameter" title="Permalink to this headline">¶</a></h3>
+<p>This one appears often: any python-callable C function takes two arguments,
+of which the first is not used for functions (only for methods). One way to
+solve it is to tag the function argument with a macro NPY_UNUSED. This macro
+uses compiler specific code to tag the variable, and mangle it such as it is
+not possible to use it accidentally once it is tagged.</p>
+<p>The code to apply compiler specific option could be:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#if defined(__GNUC__)</span>
+        <span class="cp">#define __COMP_NPY_UNUSED __attribute__ ((__unused__))</span>
+<span class="cp"># elif defined(__ICC)</span>
+        <span class="cp">#define __COMP_NPY_UNUSED __attribute__ ((__unused__))</span>
+<span class="cp">#else</span>
+        <span class="cp">#define __COMP_NPY_UNUSED</span>
+<span class="cp">#endif</span>
+</pre></div>
+</div>
+<p>The variable mangling would be:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#define NPY_UNUSED(x) (__NPY_UNUSED_TAGGED ## x) __COMP_NPY_UNUSED</span>
+</pre></div>
+</div>
+<p>When applied to a variable, one would get:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">int</span> <span class="n">foo</span><span class="p">(</span><span class="kt">int</span> <span class="o">*</span> <span class="n">NPY_UNUSED</span><span class="p">(</span><span class="n">dummy</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>expanded to:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">int</span> <span class="n">foo</span><span class="p">(</span><span class="kt">int</span> <span class="o">*</span> <span class="n">__NPY_UNUSED_TAGGEDdummy</span> <span class="n">__COMP_NPY_UNUSED</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Thus avoiding any accidental use of the variable. The mangling is pure C, and
+thuse portable. The per-variable warning disabling is compiler specific.</p>
+</div>
+<div class="section" id="signed-unsigned-comparison">
+<h3>signed/unsigned comparison<a class="headerlink" href="#signed-unsigned-comparison" title="Permalink to this headline">¶</a></h3>
+<p>More tricky: not always clear what to do</p>
+</div>
+<div class="section" id="half-initialized-structures">
+<h3>half-initialized structures<a class="headerlink" href="#half-initialized-structures" title="Permalink to this headline">¶</a></h3>
+<p>Just put the elements with NULL in it.</p>
+</div>
+</div>
+</div>
+
+
+              </div>
+              
+              
+          </main>
+          
+
+      </div>
+    </div>
+
+    
+  <script src="_static/js/index.d3f166471bb80abb5163.js"></script>
+
+
+    <footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    <p>
+          &copy; Copyright 2017-2018, NumPy Developers.<br/>
+        Last updated on Feb 22, 2021.<br/>
+        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.1.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

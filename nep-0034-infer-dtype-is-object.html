@@ -1,0 +1,378 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NEP 34 — Disallow inferring dtype=object from sequences &#8212; NumPy Enhancement Proposals</title>
+    
+  <link rel="stylesheet" href="_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
+
+    
+  <link rel="stylesheet"
+    href="_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+  <link rel="stylesheet"
+    href="_static/vendor/open-sans_all/1.44.1/index.css">
+  <link rel="stylesheet"
+    href="_static/vendor/lato_latin-ext/1.44.1/index.css">
+
+    
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/basic.css" type="text/css" />
+    
+  <link rel="preload" as="script" href="_static/js/index.d3f166471bb80abb5163.js">
+
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="NEP 38 — Using SIMD optimization instructions for performance" href="nep-0038-SIMD-optimizations.html" />
+    <link rel="prev" title="NEP 32 — Remove the financial functions from NumPy" href="nep-0032-remove-financial-functions.html" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+<link rel="stylesheet" href="_static/numpy.css" type="text/css" />
+
+    <!-- PR #17220: This is added via javascript in versionwarning.js  -->
+    <!-- link rel="canonical" href="http://numpy.org/doc/stable/nep-0034-infer-dtype-is-object.html" / -->
+
+
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main">
+<div class="container-xl">
+
+    <a class="navbar-brand" href="content.html">
+    
+      <img src="_static/numpylogo.svg" class="logo" alt="logo" />
+    
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div id="navbar-menu" class="col-lg-9 collapse navbar-collapse">
+      <ul id="navbar-main-elements" class="navbar-nav mr-auto">
+        
+        
+        <li class="nav-item active">
+            <a class="nav-link" href="index.html">Index</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="scope.html">The Scope of NumPy</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="roadmap.html">Current roadmap</a>
+        </li>
+        
+        
+        <li class="nav-item">
+            <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">Wishlist<i class="fas fa-external-link-alt"></i></a>
+        </li>
+        
+      </ul>
+
+
+      
+
+      <ul class="navbar-nav">
+        
+          <li class="nav-item">
+            <a class="nav-link" href="https://github.com/numpy/numpy" target="_blank" rel="noopener">
+              <span><i class="fab fa-github-square"></i></span>
+            </a>
+          </li>
+        
+        
+          <li class="nav-item">
+            <a class="nav-link" href="https://twitter.com/numpy_team" target="_blank" rel="noopener">
+              <span><i class="fab fa-twitter-square"></i></span>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+          <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form>
+<nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+
+    <div class="bd-toc-item active">
+    
+  
+    <ul class="nav bd-sidenav">
+        
+        
+          
+        
+        
+        
+        
+        
+        
+      </ul>
+  
+  </nav>
+          </div>
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+              
+<div class="tocsection onthispage pt-5 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="nav section-nav flex-column">
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#abstract" class="nav-link">Abstract</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#motivation-and-scope" class="nav-link">Motivation and Scope</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#usage-and-impact" class="nav-link">Usage and Impact</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#detailed-description" class="nav-link">Detailed description</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#related-work" class="nav-link">Related Work</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#implementation" class="nav-link">Implementation</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#backward-compatibility" class="nav-link">Backward compatibility</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#alternatives" class="nav-link">Alternatives</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#discussion" class="nav-link">Discussion</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#references-and-footnotes" class="nav-link">References and Footnotes</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#copyright" class="nav-link">Copyright</a>
+        </li>
+    
+    </ul>
+</nav>
+
+
+              
+          </div>
+          
+
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <div class="section" id="nep-34-disallow-inferring-dtype-object-from-sequences">
+<span id="nep34"></span><h1>NEP 34 — Disallow inferring <code class="docutils literal notranslate"><span class="pre">dtype=object</span></code> from sequences<a class="headerlink" href="#nep-34-disallow-inferring-dtype-object-from-sequences" title="Permalink to this headline">¶</a></h1>
+<dl class="field-list simple">
+<dt class="field-odd">Author</dt>
+<dd class="field-odd"><p>Matti Picus</p>
+</dd>
+<dt class="field-even">Status</dt>
+<dd class="field-even"><p>Accepted</p>
+</dd>
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Standards Track</p>
+</dd>
+<dt class="field-even">Created</dt>
+<dd class="field-even"><p>2019-10-10</p>
+</dd>
+<dt class="field-odd">Resolution</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://mail.python.org/pipermail/numpy-discussion/2019-October/080200.html">https://mail.python.org/pipermail/numpy-discussion/2019-October/080200.html</a></p>
+</dd>
+</dl>
+<div class="section" id="abstract">
+<h2>Abstract<a class="headerlink" href="#abstract" title="Permalink to this headline">¶</a></h2>
+<p>When users create arrays with sequences-of-sequences, they sometimes err in
+matching the lengths of the nested <a class="reference external" href="https://docs.python.org/3.7/glossary.html#term-sequence">sequences</a>, commonly called “ragged
+arrays”.  Here we will refer to them as ragged nested sequences. Creating such
+arrays via <code class="docutils literal notranslate"><span class="pre">np.array([&lt;ragged_nested_sequence&gt;])</span></code> with no <code class="docutils literal notranslate"><span class="pre">dtype</span></code> keyword
+argument will today default to an <code class="docutils literal notranslate"><span class="pre">object</span></code>-dtype array. Change the behaviour to
+raise a <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> instead.</p>
+</div>
+<div class="section" id="motivation-and-scope">
+<h2>Motivation and Scope<a class="headerlink" href="#motivation-and-scope" title="Permalink to this headline">¶</a></h2>
+<p>Users who specify lists-of-lists when creating a <cite>numpy.ndarray</cite> via
+<code class="docutils literal notranslate"><span class="pre">np.array</span></code> may mistakenly pass in lists of different lengths. Currently we
+accept this input and automatically create an array with <code class="docutils literal notranslate"><span class="pre">dtype=object</span></code>. This
+can be confusing, since it is rarely what is desired. Changing the automatic
+dtype detection to never return <code class="docutils literal notranslate"><span class="pre">object</span></code> for ragged nested sequences (defined as a
+recursive sequence of sequences, where not all the sequences on the same
+level have the same length) will force users who actually wish to create
+<code class="docutils literal notranslate"><span class="pre">object</span></code> arrays to specify that explicitly. Note that <code class="docutils literal notranslate"><span class="pre">lists</span></code>, <code class="docutils literal notranslate"><span class="pre">tuples</span></code>,
+and <code class="docutils literal notranslate"><span class="pre">nd.ndarrays</span></code> are all sequences <a class="footnote-reference brackets" href="#id2" id="id1">0</a>. See for instance <a class="reference external" href="https://github.com/numpy/numpy/issues/5303">issue 5303</a>.</p>
+</div>
+<div class="section" id="usage-and-impact">
+<h2>Usage and Impact<a class="headerlink" href="#usage-and-impact" title="Permalink to this headline">¶</a></h2>
+<p>After this change, array creation with ragged nested sequences must explicitly
+define a dtype:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">]])</span>
+<span class="go">ValueError: cannot guess the desired dtype from the input</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">object</span><span class="p">)</span>
+<span class="go"># succeeds, with no change from current behaviour</span>
+</pre></div>
+</div>
+<p>The deprecation will affect any call that internally calls <code class="docutils literal notranslate"><span class="pre">np.asarray</span></code>.  For
+instance, the <code class="docutils literal notranslate"><span class="pre">assert_equal</span></code> family of functions calls <code class="docutils literal notranslate"><span class="pre">np.asarray</span></code>, so
+users will have to change code like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="mi">3</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>to:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="mi">3</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">object</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="detailed-description">
+<h2>Detailed description<a class="headerlink" href="#detailed-description" title="Permalink to this headline">¶</a></h2>
+<p>To explicitly set the shape of the object array, since it is sometimes hard to
+determine what shape is desired, one could use:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">correct_shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">object</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span><span class="p">[</span><span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">values</span>
+</pre></div>
+</div>
+<p>We will also reject mixed sequences of non-sequence and sequence, for instance
+all of these will be rejected:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span> <span class="p">[</span><span class="mi">10</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)],</span> <span class="p">[</span><span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]])</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="related-work">
+<h2>Related Work<a class="headerlink" href="#related-work" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="https://github.com/numpy/numpy/pull/14341">PR 14341</a> tried to raise an error when ragged nested sequences were specified
+with a numeric dtype <code class="docutils literal notranslate"><span class="pre">np.array,</span> <span class="pre">[[1],</span> <span class="pre">[2,</span> <span class="pre">3]],</span> <span class="pre">dtype=int)</span></code> but failed due to
+false-positives, for instance <code class="docutils literal notranslate"><span class="pre">np.array([1,</span> <span class="pre">np.array([5])],</span> <span class="pre">dtype=int)</span></code>.</p>
+</div>
+<div class="section" id="implementation">
+<h2>Implementation<a class="headerlink" href="#implementation" title="Permalink to this headline">¶</a></h2>
+<p>The code to be changed is inside <code class="docutils literal notranslate"><span class="pre">PyArray_GetArrayParamsFromObject</span></code> and the
+internal <code class="docutils literal notranslate"><span class="pre">discover_dimensions</span></code> function. The first implementation in <a class="reference external" href="https://github.com/numpy/numpy/pull/14794">PR
+14794</a> caused a number of downstream library failures and was reverted before
+the release of 1.18. Subsequently downstream libraries fixed the places they
+were using ragged arrays. The reimplementation became <a class="reference external" href="https://github.com/numpy/numpy/pull/15119">PR 15119</a> which was
+merged for the 1.19 release.</p>
+</div>
+<div class="section" id="backward-compatibility">
+<h2>Backward compatibility<a class="headerlink" href="#backward-compatibility" title="Permalink to this headline">¶</a></h2>
+<p>Anyone depending on creating object arrays from ragged nested sequences will
+need to modify their code. There will be a deprecation period during which the
+current behaviour will emit a <code class="docutils literal notranslate"><span class="pre">DeprecationWarning</span></code>.</p>
+</div>
+<div class="section" id="alternatives">
+<h2>Alternatives<a class="headerlink" href="#alternatives" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>We could continue with the current situation.</p></li>
+<li><p>It was also suggested to add a kwarg <code class="docutils literal notranslate"><span class="pre">depth</span></code> to array creation, or perhaps
+to add another array creation API function <code class="docutils literal notranslate"><span class="pre">ragged_array_object</span></code>. The goal
+was to eliminate the ambiguity in creating an object array from <code class="docutils literal notranslate"><span class="pre">array([[1,</span>
+<span class="pre">2],</span> <span class="pre">[1]],</span> <span class="pre">dtype=object)</span></code>: should the returned array have a shape of
+<code class="docutils literal notranslate"><span class="pre">(1,)</span></code>, or <code class="docutils literal notranslate"><span class="pre">(2,)</span></code>? This NEP does not deal with that issue, and only
+deprecates the use of <code class="docutils literal notranslate"><span class="pre">array</span></code> with no <code class="docutils literal notranslate"><span class="pre">dtype=object</span></code> for ragged nested
+sequences. Users of ragged nested sequences may face another deprecation
+cycle in the future. Rationale: we expect that there are very few users who
+intend to use ragged arrays like that, this was never intended as a use case
+of NumPy arrays. Users are likely better off with <a class="reference external" href="https://github.com/scikit-hep/awkward-array">another library</a> or just
+using list of lists.</p></li>
+<li><p>It was also suggested to deprecate all automatic creation of <code class="docutils literal notranslate"><span class="pre">object</span></code>-dtype
+arrays, which would require adding an explicit <code class="docutils literal notranslate"><span class="pre">dtype=object</span></code> for something
+like <code class="docutils literal notranslate"><span class="pre">np.array([Decimal(10),</span> <span class="pre">Decimal(10)])</span></code>. This too is out of scope for
+the current NEP. Rationale: it’s harder to asses the impact of this larger
+change, we’re not sure how many users this may impact.</p></li>
+</ul>
+</div>
+<div class="section" id="discussion">
+<h2>Discussion<a class="headerlink" href="#discussion" title="Permalink to this headline">¶</a></h2>
+<p>Comments to <a class="reference external" href="https://github.com/numpy/numpy/issues/5303">issue 5303</a> indicate this is unintended behaviour as far back as
+2014. Suggestions to change it have been made in the ensuing years, but none
+have stuck. The WIP implementation in <a class="reference external" href="https://github.com/numpy/numpy/pull/14794">PR 14794</a> seems to point to the
+viability of this approach.</p>
+</div>
+<div class="section" id="references-and-footnotes">
+<h2>References and Footnotes<a class="headerlink" href="#references-and-footnotes" title="Permalink to this headline">¶</a></h2>
+<dl class="footnote brackets">
+<dt class="label" id="id2"><span class="brackets"><a class="fn-backref" href="#id1">0</a></span></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">np.ndarrays</span></code> are not recursed into, rather their shape is used
+directly. This will not emit warnings:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ragged</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">object</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">ragged</span><span class="p">,</span> <span class="n">ragged</span><span class="p">])</span> <span class="c1"># no dtype needed</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</div>
+<div class="section" id="copyright">
+<h2>Copyright<a class="headerlink" href="#copyright" title="Permalink to this headline">¶</a></h2>
+<p>This document has been placed in the public domain.</p>
+</div>
+</div>
+
+
+              </div>
+              
+              
+          </main>
+          
+
+      </div>
+    </div>
+
+    
+  <script src="_static/js/index.d3f166471bb80abb5163.js"></script>
+
+
+    <footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    <p>
+          &copy; Copyright 2017-2018, NumPy Developers.<br/>
+        Last updated on Feb 22, 2021.<br/>
+        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.1.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

@@ -1,0 +1,231 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NEP 14 — Plan for dropping Python 2.7 support &#8212; NumPy Enhancement Proposals</title>
+    
+  <link rel="stylesheet" href="_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
+
+    
+  <link rel="stylesheet"
+    href="_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+  <link rel="stylesheet"
+    href="_static/vendor/open-sans_all/1.44.1/index.css">
+  <link rel="stylesheet"
+    href="_static/vendor/lato_latin-ext/1.44.1/index.css">
+
+    
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/basic.css" type="text/css" />
+    
+  <link rel="preload" as="script" href="_static/js/index.d3f166471bb80abb5163.js">
+
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="NEP 23 — Backwards compatibility and deprecation policy" href="nep-0023-backwards-compatibility.html" />
+    <link rel="prev" title="NEP X — Template and Instructions" href="nep-template.html" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+<link rel="stylesheet" href="_static/numpy.css" type="text/css" />
+
+    <!-- PR #17220: This is added via javascript in versionwarning.js  -->
+    <!-- link rel="canonical" href="http://numpy.org/doc/stable/nep-0014-dropping-python2.7-proposal.html" / -->
+
+
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main">
+<div class="container-xl">
+
+    <a class="navbar-brand" href="content.html">
+    
+      <img src="_static/numpylogo.svg" class="logo" alt="logo" />
+    
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div id="navbar-menu" class="col-lg-9 collapse navbar-collapse">
+      <ul id="navbar-main-elements" class="navbar-nav mr-auto">
+        
+        
+        <li class="nav-item active">
+            <a class="nav-link" href="index.html">Index</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="scope.html">The Scope of NumPy</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="roadmap.html">Current roadmap</a>
+        </li>
+        
+        
+        <li class="nav-item">
+            <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">Wishlist<i class="fas fa-external-link-alt"></i></a>
+        </li>
+        
+      </ul>
+
+
+      
+
+      <ul class="navbar-nav">
+        
+          <li class="nav-item">
+            <a class="nav-link" href="https://github.com/numpy/numpy" target="_blank" rel="noopener">
+              <span><i class="fab fa-github-square"></i></span>
+            </a>
+          </li>
+        
+        
+          <li class="nav-item">
+            <a class="nav-link" href="https://twitter.com/numpy_team" target="_blank" rel="noopener">
+              <span><i class="fab fa-twitter-square"></i></span>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+          <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form>
+<nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+
+    <div class="bd-toc-item active">
+    
+  
+    <ul class="nav bd-sidenav">
+        
+        
+          
+        
+        
+        
+        
+        
+        
+      </ul>
+  
+  </nav>
+          </div>
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+              
+
+<nav id="bd-toc-nav">
+    <ul class="nav section-nav flex-column">
+    
+    </ul>
+</nav>
+
+
+              
+          </div>
+          
+
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <div class="section" id="nep-14-plan-for-dropping-python-2-7-support">
+<span id="nep14"></span><h1>NEP 14 — Plan for dropping Python 2.7 support<a class="headerlink" href="#nep-14-plan-for-dropping-python-2-7-support" title="Permalink to this headline">¶</a></h1>
+<dl class="field-list simple">
+<dt class="field-odd">Status</dt>
+<dd class="field-odd"><p>Accepted</p>
+</dd>
+<dt class="field-even">Resolution</dt>
+<dd class="field-even"><p><a class="reference external" href="https://mail.python.org/pipermail/numpy-discussion/2017-November/077419.html">https://mail.python.org/pipermail/numpy-discussion/2017-November/077419.html</a></p>
+</dd>
+</dl>
+<p>The Python core team plans to stop supporting Python 2 in 2020. The NumPy
+project has supported both Python 2 and Python 3 in parallel since 2010, and
+has found that supporting Python 2 is an increasing burden on our limited
+resources; thus, we plan to eventually drop Python 2 support as well. Now that
+we’re entering the final years of community-supported Python 2, the NumPy
+project wants to clarify our plans, with the goal of to helping our downstream
+ecosystem make plans and accomplish the transition with as little disruption as
+possible.</p>
+<p>Our current plan is as follows.</p>
+<p>Until <strong>December 31, 2018</strong>, all NumPy releases will fully support both
+Python2 and Python3.</p>
+<p>Starting on <strong>January 1, 2019</strong>, any new feature releases will support only
+Python3.</p>
+<p>The last Python2 supporting release will be designated as a long term support
+(LTS) release, meaning that we will continue to merge bug fixes and make bug
+fix releases for a longer period than usual.  Specifically, it will be
+supported by the community until <strong>December 31, 2019</strong>.</p>
+<p>On <strong>January 1, 2020</strong> we will raise a toast to Python2, and community support
+for the last Python2 supporting release will come to an end. However, it will
+continue to be available on PyPI indefinitely, and if any commercial vendors
+wish to extend the LTS support past this point then we are open to letting them
+use the LTS branch in the official NumPy repository to coordinate that.</p>
+<p>If you are a NumPy user who requires ongoing Python2 support in 2020 or later,
+then please contact your vendor. If you are a vendor who wishes to continue to
+support NumPy on Python2 in 2020+, please get in touch; ideally we’d like you
+to get involved in maintaining the LTS before it actually hits end of life so
+that we can make a clean handoff.</p>
+<p>To minimize disruption, running <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">numpy</span></code> on Python 2 will continue
+to give the last working release in perpetuity, but after January 1, 2019 it
+may not contain the latest features, and after January 1, 2020 it may not
+contain the latest bug fixes.</p>
+<p>For more information on the scientific Python ecosystem’s transition
+to Python3 only, see the <a class="reference external" href="https://python3statement.org/">python3-statement</a>.</p>
+<p>For more information on porting your code to run on Python 3, see the
+<a class="reference external" href="https://docs.python.org/3/howto/pyporting.html">python3-howto</a>.</p>
+</div>
+
+
+              </div>
+              
+              
+          </main>
+          
+
+      </div>
+    </div>
+
+    
+  <script src="_static/js/index.d3f166471bb80abb5163.js"></script>
+
+
+    <footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    <p>
+          &copy; Copyright 2017-2018, NumPy Developers.<br/>
+        Last updated on Feb 22, 2021.<br/>
+        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.1.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

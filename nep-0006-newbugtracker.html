@@ -1,0 +1,392 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NEP 6 — Replacing Trac with a different bug tracker &#8212; NumPy Enhancement Proposals</title>
+    
+  <link rel="stylesheet" href="_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
+
+    
+  <link rel="stylesheet"
+    href="_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+  <link rel="stylesheet"
+    href="_static/vendor/open-sans_all/1.44.1/index.css">
+  <link rel="stylesheet"
+    href="_static/vendor/lato_latin-ext/1.44.1/index.css">
+
+    
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/basic.css" type="text/css" />
+    
+  <link rel="preload" as="script" href="_static/js/index.d3f166471bb80abb5163.js">
+
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="NEP 8 — A proposal for adding groupby functionality to NumPy" href="nep-0008-groupby_additions.html" />
+    <link rel="prev" title="NEP 4 — A (third) proposal for implementing some date/time types in NumPy" href="nep-0004-datetime-proposal3.html" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+<link rel="stylesheet" href="_static/numpy.css" type="text/css" />
+
+    <!-- PR #17220: This is added via javascript in versionwarning.js  -->
+    <!-- link rel="canonical" href="http://numpy.org/doc/stable/nep-0006-newbugtracker.html" / -->
+
+
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main">
+<div class="container-xl">
+
+    <a class="navbar-brand" href="content.html">
+    
+      <img src="_static/numpylogo.svg" class="logo" alt="logo" />
+    
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div id="navbar-menu" class="col-lg-9 collapse navbar-collapse">
+      <ul id="navbar-main-elements" class="navbar-nav mr-auto">
+        
+        
+        <li class="nav-item active">
+            <a class="nav-link" href="index.html">Index</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="scope.html">The Scope of NumPy</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="roadmap.html">Current roadmap</a>
+        </li>
+        
+        
+        <li class="nav-item">
+            <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">Wishlist<i class="fas fa-external-link-alt"></i></a>
+        </li>
+        
+      </ul>
+
+
+      
+
+      <ul class="navbar-nav">
+        
+          <li class="nav-item">
+            <a class="nav-link" href="https://github.com/numpy/numpy" target="_blank" rel="noopener">
+              <span><i class="fab fa-github-square"></i></span>
+            </a>
+          </li>
+        
+        
+          <li class="nav-item">
+            <a class="nav-link" href="https://twitter.com/numpy_team" target="_blank" rel="noopener">
+              <span><i class="fab fa-twitter-square"></i></span>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+          <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form>
+<nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+
+    <div class="bd-toc-item active">
+    
+  
+    <ul class="nav bd-sidenav">
+        
+        
+          
+        
+        
+        
+        
+        
+        
+      </ul>
+  
+  </nav>
+          </div>
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+              
+<div class="tocsection onthispage pt-5 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="nav section-nav flex-column">
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#scenario" class="nav-link">Scenario</a><ul class="nav section-nav flex-column">
+                
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#new-release" class="nav-link">new release</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#subcomponent-maintainer" class="nav-link">subcomponent maintainer</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#review-newcoming-code" class="nav-link">Review, newcoming code</a>
+        </li>
+    
+            </ul>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#current-trac-limitation" class="nav-link">Current trac limitation</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#possible-candidates" class="nav-link">Possible candidates</a><ul class="nav section-nav flex-column">
+                
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#updated-trac-plugins" class="nav-link">Updated trac + plugins</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#redmine" class="nav-link">Redmine</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#roundup" class="nav-link">Roundup</a>
+        </li>
+    
+            </ul>
+        </li>
+    
+    </ul>
+</nav>
+
+
+              
+          </div>
+          
+
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <div class="section" id="nep-6-replacing-trac-with-a-different-bug-tracker">
+<span id="nep06"></span><h1>NEP 6 — Replacing Trac with a different bug tracker<a class="headerlink" href="#nep-6-replacing-trac-with-a-different-bug-tracker" title="Permalink to this headline">¶</a></h1>
+<dl class="field-list simple">
+<dt class="field-odd">Author</dt>
+<dd class="field-odd"><p>David Cournapeau, Stefan van der Walt</p>
+</dd>
+<dt class="field-even">Status</dt>
+<dd class="field-even"><p>Deferred</p>
+</dd>
+</dl>
+<p>Some release managers of both numpy and scipy are becoming more and more
+dissatisfied with the current development workflow, in particular for bug
+tracking. This document is a tentative to explain some problematic scenario,
+current trac limitations, and what can be done about it.</p>
+<div class="section" id="scenario">
+<h2>Scenario<a class="headerlink" href="#scenario" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="new-release">
+<h3>new release<a class="headerlink" href="#new-release" title="Permalink to this headline">¶</a></h3>
+<p>The workflow for a release is roughly as follows:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>find all known regressions from last release, and fix them</p></li>
+<li><p>get an idea of all bugs reported since last release</p></li>
+<li><p>triage bugs in regressions/blocker issues/etc…, and assign them in
+the according roadmap, subpackage and maintainers</p></li>
+<li><p>pinging subpackage maintainers</p></li>
+</ul>
+</div></blockquote>
+<p>Most of those tasks are quite inefficient in the current trac as used on scipy:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>it is hard to keep track of issues. In particular, every time one goes
+to trac, we don’t really know what’s new from what’s not. If you
+think of issues as emails, the current situation would be like not
+having read/unread feature.</p></li>
+<li><p>Batch handling of issues: changing characteristics of several issues
+at the same time is difficult, because the only available UI is
+web-based. Command-line based UI are much more efficient for this
+kind of scenario</p></li>
+</ul>
+</div></blockquote>
+<p>More generally, making useful reports is very awkward with the currently
+deployed trac. Trac 0.11 may solve of those problems, but it has to be much
+better than the actually deployed version on scipy website. Finding issues with
+patches, old patches, etc… and making reports has to be much more streamlined
+that it is now.</p>
+</div>
+<div class="section" id="subcomponent-maintainer">
+<h3>subcomponent maintainer<a class="headerlink" href="#subcomponent-maintainer" title="Permalink to this headline">¶</a></h3>
+<p>Say you are the maintainer of scipy.foo, then you are mostly interested in
+getting bugs concerning scipy.foo only. But it should be easy for the general
+team to follow your work - it should also be easy for casual users (e.g. not
+developers) to follow some new features development pace.</p>
+</div>
+<div class="section" id="review-newcoming-code">
+<h3>Review, newcoming code<a class="headerlink" href="#review-newcoming-code" title="Permalink to this headline">¶</a></h3>
+<p>The goal is simple: make the bar as low as possible, and make sure people know
+what to do at every step to contribute to numpy or scipy:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Right now, patches languish for too long in trac. Of course, lack of
+time is one big reason; but the process of following new contributes
+could be made much simpler</p></li>
+<li><p>It should be possible to be pinged only for reviews one a subset of
+numpy/scipy.</p></li>
+<li><p>It should be possible for people interested in the patches to follow
+its progression. Comments, but also ‘mini’ timelines could be useful,
+particularly for massive issues (massive from a coding POV).</p></li>
+</ul>
+</div></blockquote>
+</div>
+</div>
+<div class="section" id="current-trac-limitation">
+<h2>Current trac limitation<a class="headerlink" href="#current-trac-limitation" title="Permalink to this headline">¶</a></h2>
+<p>Note: by trac, we mean the currently deployed one. Some more recent versions
+may solve some of the issues.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Multi-project support: we have three trac instances, one for scipy,
+one for numpy, one for scikits. Creating accounts, maintaining and
+updating each of them is a maintenance burden. Nobody likes to do
+this kind of work, so anything which can reduce the burden is a plus.
+Also, it happens quite frequently that a bug against numpy is filled
+on scipy trac and vice and versa. You have to handle this manually,
+currently.</p></li>
+<li><p>Clients not based on the web-ui. This can be made through the xmlrpc
+plugin + some clients. In particular, something like
+<a class="reference external" href="http://tracexplorer.devjavu.com/">http://tracexplorer.devjavu.com/</a> can be interesting for people who
+like IDE. At least one person expressed his desire to have as much
+integration as possible with Eclipse.</p></li>
+<li><p>Powerful queries: it should be possible to quickly find issues
+between two releases, the new issues from a given date, issues with
+patch, issues waiting for reviews, etc… The issues data have to be
+customizable, because most bug-tracker do not support things like
+review, etc… so we need to handle this ourselves (through tags,
+etc…)</p></li>
+<li><p>Marking issues as read/unread. It should also be possible for any
+user to ‘mask’ issues to ignore them.</p></li>
+<li><p>ticket dependency. This is quite helpful in my experience for big
+features which can be split into several issues. Roadmap can only be
+created by trac admin, and they are kind of heavy-weight.</p></li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="possible-candidates">
+<h2>Possible candidates<a class="headerlink" href="#possible-candidates" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="updated-trac-plugins">
+<h3>Updated trac + plugins<a class="headerlink" href="#updated-trac-plugins" title="Permalink to this headline">¶</a></h3>
+<p>Pros:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Same system</p></li>
+<li><p>In python, so we can hack it if we want</p></li>
+</ul>
+</div></blockquote>
+<p>Cons:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Trac is aimed at being basic, and extended with plugins. But most
+plugins are broken, or not up to date. The information on which
+plugins are mature is not easily available.</p></li>
+<li><p>At least the scipy.org trac was slow, and needed to be restarted
+constantly. This is simply not acceptable.</p></li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="redmine">
+<h3>Redmine<a class="headerlink" href="#redmine" title="Permalink to this headline">¶</a></h3>
+<p>Pros:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Support most features (except xmlrpc ?). Multi-project, etc…</p></li>
+<li><p>(subjective): I (cdavid) find the out-of-the-box experience with
+redmine much more enjoyable. More information is available easily,
+less clicks, more streamlined. See
+<a class="reference external" href="http://www.redmine.org/wiki/redmine/TheyAreUsingRedmine">http://www.redmine.org/wiki/redmine/TheyAreUsingRedmine</a> for examples</p></li>
+<li><p>Conversion scripts from trac (no experience with it yet for numpy/scipy).</p></li>
+<li><p>Community seems friendly and gets a lof of features done</p></li>
+</ul>
+</div></blockquote>
+<p>Cons:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>new system, less mature ?</p></li>
+<li><p>in Ruby: since we are a python project, most of dev are familiar with
+python.</p></li>
+<li><p>Wiki integration, etc… ?</p></li>
+</ul>
+</div></blockquote>
+<p>Unknown:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>xmlrpc API</p></li>
+<li><p>performances</p></li>
+<li><p>maintenance cost</p></li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="roundup">
+<h3>Roundup<a class="headerlink" href="#roundup" title="Permalink to this headline">¶</a></h3>
+<p>TODO</p>
+</div>
+</div>
+</div>
+
+
+              </div>
+              
+              
+          </main>
+          
+
+      </div>
+    </div>
+
+    
+  <script src="_static/js/index.d3f166471bb80abb5163.js"></script>
+
+
+    <footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    <p>
+          &copy; Copyright 2017-2018, NumPy Developers.<br/>
+        Last updated on Feb 22, 2021.<br/>
+        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.1.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>
